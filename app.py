@@ -40,6 +40,7 @@ def get_current_time_in_timezone(timezone: str) -> str:
 
 final_answer = FinalAnswerTool()
 visit_webpage = VisitWebpageTool()
+duck_duck_go_search = DuckDuckGoSearchTool()
 
 # If the agent does not answer, the model is overloaded, please use another model or the following Hugging Face Endpoint that also contains qwen2.5 coder:
 # model_id='https://pflgm2locj2t89co.us-east-1.aws.endpoints.huggingface.cloud' 
@@ -60,7 +61,7 @@ with open("prompts.yaml", 'r') as stream:
     
 agent = CodeAgent(
     model=model,
-    tools=[final_answer, get_current_time_in_timezone, my_custom_tool, visit_webpage], ## add your tools here (don't remove final answer)
+    tools=[final_answer, get_current_time_in_timezone, my_custom_tool, visit_webpage, duck_duck_go_search], ## add your tools here (don't remove final answer)
     max_steps=6,
     verbosity_level=1,
     grammar=None,
