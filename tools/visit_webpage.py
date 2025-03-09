@@ -13,6 +13,7 @@ class VisitWebpageTool(Tool):
     def forward(self, url: str) -> str:
         try:
             import requests
+            import re
             from markdownify import markdownify
             from requests.exceptions import RequestException
 
