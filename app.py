@@ -1,12 +1,22 @@
-from smolagents import CodeAgent,DuckDuckGoSearchTool, HfApiModel,load_tool,tool
 import datetime
-import requests
+import os
+import sys
+import litellm
 import pytz
 import yaml
+from smolagents import CodeAgent, LiteLLMModel, tool
+from Gradio_UI import GradioUI
 from tools.final_answer import FinalAnswerTool
 from tools.visit_webpage import VisitWebpageTool
 
-from Gradio_UI import GradioUI
+# Very useful to see the actual interaction with the LLM at a level below the huggingface wrapper
+# litellm._turn_on_debug()
+
+if "OPENAI_API_KEY" not in os.environ:
+    print("Please set the OPENAI_API_KEY environment variable")
+    sys.exit(1)
+
+openai_api_key = os.getenv("OPENAI_API_KEY")
 
 # Below is an example of a tool that does nothing. Amaze us with your creativity !
 @tool
@@ -38,38 +48,34 @@ def get_current_time_in_timezone(timezone: str) -> str:
         return f"Error fetching time for timezone '{timezone}': {str(e)}"
 
 
-final_answer = FinalAnswerTool()
-visit_webpage = VisitWebpageTool()
-duck_duck_go_search = DuckDuckGoSearchTool()
+# duck_duck_go_search = DuckDuckGoSearchTool()
 
-# If the agent does not answer, the model is overloaded, please use another model or the following Hugging Face Endpoint that also contains qwen2.5 coder:
-# model_id='https://pflgm2locj2t89co.us-east-1.aws.endpoints.huggingface.cloud' 
-
-model = HfApiModel(
-max_tokens=2096,
-temperature=0.5,
-model_id='Qwen/Qwen2.5-Coder-32B-Instruct',# it is possible that this model may be overloaded
-custom_role_conversions=None,
+model = LiteLLMModel(
+    model_id="openai/gpt-4o-mini",
+    api_base="https://api.openai.com/v1",
+    api_key=openai_api_key
 )
 
-
 # Import tool from Hub
-image_generation_tool = load_tool("agents-course/text-to-image", trust_remote_code=True)
+# image_generation_tool = load_tool("agents-course/text-to-image", trust_remote_code=True)
 
-with open("prompts.yaml", 'r') as stream:
+with open("prompts.yaml", 'r', encoding='utf-8') as stream:
     prompt_templates = yaml.safe_load(stream)
-    
+
 agent = CodeAgent(
     model=model,
-    tools=[final_answer, get_current_time_in_timezone, my_custom_tool, visit_webpage, duck_duck_go_search], ## add your tools here (don't remove final answer)
+    tools=[FinalAnswerTool(), VisitWebpageTool(), get_current_time_in_timezone], ## add your tools here (don't remove final answer)
     max_steps=6,
     verbosity_level=1,
     grammar=None,
     planning_interval=None,
     name=None,
     description=None,
-    prompt_templates=prompt_templates
+    prompt_templates=prompt_templates,
+    additional_authorized_imports=["requests", "markdownify"],
 )
 
+# If you don't want to run this as a gradio app, just use the following line
+response = agent.run("What is the next event posted on hsv.ai?")
 
-GradioUI(agent).launch()
+# GradioUI(agent).launch()

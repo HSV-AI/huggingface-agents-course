@@ -1,5 +1,5 @@
 markdownify
-smolagents
+smolagents[gradio,litellm]
 requests
 duckduckgo_search
 pandas
