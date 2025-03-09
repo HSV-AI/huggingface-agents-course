@@ -76,6 +76,6 @@ agent = CodeAgent(
 )
 
 # If you don't want to run this as a gradio app, just use the following line
-response = agent.run("What is the next event posted on hsv.ai?")
+response = agent.run("Find the next event posted on hsv.ai and use the link provided in the event to provide a summary.")
 
 # GradioUI(agent).launch()
