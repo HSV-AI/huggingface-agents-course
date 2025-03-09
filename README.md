@@ -15,8 +15,7 @@ tags:
 - agent-course
 ---
 
-Check out the configuration reference at https://huggingface.co/docs/hub/spaces-config-reference
 
-# Huggingface Agents Course
+# [Huggingface Agents Course](https://huggingface.co/learn/agents-course/en/unit0/introduction)
 
 This repository started as a clone of the Huggingface space for their AI Agents course. Initial changes were to reconfigure the CodeAgent to use an OpenAI model to avoid the monthly quota on the Huggingface direct inference. You will need to use an environment variable for "OPENAI_API_KEY" and ensure that the associated OpenAI project has access to the model specified for the LiteLLMModel.
